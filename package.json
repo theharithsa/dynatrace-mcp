@@ -1,0 +1,45 @@
+{
+  "name": "@dynatrace/dynatrace-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (MCP) server for Dynatrace",
+  "main": "./dist/index.js",
+  "type": "commonjs",
+  "bin": {
+    "mcp-server-dynatrace": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "directories": {
+    "dist": "dist"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "prepare": "npm run build",
+    "watch": "tsc --watch"
+  },
+  "author": "Dynatrace",
+  "license": "MIT",
+  "dependencies": {
+    "@dynatrace-sdk/client-automation": "^5.3.0",
+    "@dynatrace-sdk/client-classic-environment-v2": "^3.6.8",
+    "@dynatrace-sdk/client-platform-management-service": "^1.6.3",
+    "@dynatrace-sdk/client-query": "^1.18.1",
+    "@modelcontextprotocol/sdk": "^1.8.0",
+    "dotenv": "^16.4.7",
+    "dt-app": "^0.138.0",
+    "zod-to-json-schema": "^3.24.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  }
+}
