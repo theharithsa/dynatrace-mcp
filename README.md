@@ -6,7 +6,6 @@ This repository provides a model-context-protocol package for interacting with D
 
 ## Quickstart
 
-WIP
 
 ## Environment Variables
 
