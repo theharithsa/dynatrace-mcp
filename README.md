@@ -1,8 +1,9 @@
 # Dynatrace MCP
 
+> **Note**: This product is not officially supported by Dynatrace. Please reach out via GitHub Issues if you have feature-requests, questions, or need help.
+
 This repository provides a model-context-protocol package for interacting with Dynatrace.
 
-**Note**: This product is not officially supported by Dynatrace. Please reach out via GitHub Issues if you have feature-requests, questions, or need help.
 
 ## Quickstart
 

@@ -1,5 +1,5 @@
 {
-  "name": "@christian-kreuzberger-dtx/dynatrace-mcp",
+  "name": "@dynatrace-oss/dynatrace-mcp",
   "version": "0.1.0",
   "description": "Model Context Protocol (MCP) server for Dynatrace",
   "main": "./dist/index.js",
