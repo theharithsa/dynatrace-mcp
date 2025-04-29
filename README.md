@@ -95,6 +95,44 @@ In addition, depending on the features you use, the following variables can be c
 * `USE_WORKFLOWS` (boolean, `true` or `false`; default: `false`)
   * Requires scopes `automation:workflows:read`, `automation:workflows:write` and `automation:workflows:run` to read, write and execute Workflows
 
+## ✨ Example prompts ✨
+
+Use these example prompts as a starting point. Just copy them into your IDE or agent setup, adapt them to your services/stack/architecture,
+and extend them as needed. They’re here to help you imagine how real-time observability and automation work together in the MCP context in your IDE.
+
+**Find open vulnerabilities on production, setup alert.**
+```
+I have this code snippet here in my IDE, where I get a dependency vulnerability warning for my code.
+Check if I see any open vulnerability/cve on production.
+Analyze a specific production problem.
+Setup a workflow that sends Slack alerts to the #devops-alerts channel when availability problems occur. 
+```
+**Debug intermittent 503 errors.**
+```
+Our load balancer is intermittently returning 503 errors during peak traffic.
+Pull all recent problems detected for our front-end services and
+run a query to correlate error rates with service instance health indicators.
+I suspect we have circuit breakers triggering, but need confirmation from the telemetry data.
+```
+**Correlate memory issue with logs.**
+```
+There's a problem with high memory usage on one of our hosts.
+Get the problem details and then fetch related logs to help understand
+what's causing the memory spike? Which file in this repo is this related to?
+```
+**Trace request flow analysis.**
+```
+Our users are experiencing slow checkout processes.
+Can you execute a DQL query to show me the full request trace for our checkout flow,
+so I can identify which service is causing the bottleneck?
+```
+**Analyze Kubernetes cluster events.**
+```
+Our application deployments seem to be failing intermittently.
+Can you fetch recent events from our "production-cluster"
+to help identify what might be causing these deployment issues?
+```
+
 ## Development
 
 For development purposes, you can use VSCode and GitHub Copilot.
