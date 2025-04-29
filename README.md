@@ -12,6 +12,14 @@ Bring real-time observability data directly into your development workflow.
 - More context on security level issues
 - Natural language to query log data
 
+## Capabilities
+
+- List and get [problem](https://www.dynatrace.com/hub/detail/problems/) details from your services (for example Kubernetes)
+- List and get security problems / [vulnerability](https://www.dynatrace.com/hub/detail/vulnerabilities/) details
+- Execute DQL(Dynatrace Query Language) like getting events or logs
+- Send Slack messages (via Slack Connector)
+- Set up notification Workflow (via Dynatrace [AutomationEngine](https://docs.dynatrace.com/docs/discover-dynatrace/platform/automationengine))
+- Get Ownership of an entity
 
 ## Quickstart
 
