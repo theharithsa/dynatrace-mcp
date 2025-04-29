@@ -1,6 +1,6 @@
 # Dynatrace MCP Server
 
-This prototype for a remote MCP server allows interaction with [Dynatrace](https://www.dynatrace.com/) observability platform. 
+This remote MCP server allows interaction with the [Dynatrace](https://www.dynatrace.com/) observability platform. 
 Bring real-time observability data directly into your development workflow.
 
 <img width="1046" alt="image" src="/assets/dynatrace-mcp-arch.png" />
