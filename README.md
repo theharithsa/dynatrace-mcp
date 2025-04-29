@@ -97,6 +97,9 @@ In addition, depending on the features you use, the following variables can be c
 
 ## ✨ Example prompts ✨
 
+Use these example prompts as a starting point. Just copy them into your IDE or agent setup, adapt them to your services/stack/architecture,
+and extend them as needed. They’re here to help you imagine how real-time observability and automation work together in the MCP context in your IDE.
+
 **Find open vulnerabilities on production, setup alert.**
 ```
 I have this code snippet here in my IDE, where I get a dependency vulnerability warning for my code.
