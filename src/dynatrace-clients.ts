@@ -33,6 +33,8 @@ export const createOAuthClient = async (clientId: string, clientSecret: string, 
     throw new Error('Failed to retrieve environment URL from env "DT_ENVIRONMENT"');
   }
 
+  console.error(`Trying to authenticate API Calls to ${environmentUrl} via OAuthClientId ${clientId}`);
+
   const ssoBaseUrl = await getSSOUrl(environmentUrl);
   const ssoAuthUrl = new URL('/sso/oauth2/token', ssoBaseUrl).toString();
   console.error(`Using SSO auth URL: ${ssoAuthUrl}`);
