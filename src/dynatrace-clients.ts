@@ -16,7 +16,7 @@ const requestToken = async (clientId: string, clientSecret: string, authUrl: str
     }),
   });
   if (!res.ok) {
-    throw new Error(`Failed to fetch token: ${res.status} ${res.statusText}`);
+    console.error(`Failed to fetch token: ${res.status} ${res.statusText}`);
   }
   return await res.json();
 }
