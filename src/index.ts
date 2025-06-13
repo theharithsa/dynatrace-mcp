@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { EnvironmentInformationClient } from '@dynatrace-sdk/client-platform-management-service';
+import { ClientRequestError, isApiClientError, isApiGatewayError, isClientRequestError } from '@dynatrace-sdk/shared-errors';
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {
@@ -98,7 +99,7 @@ const main = async () => {
     },
   );
 
-  // quick abstraction/wrapper to make it easier to reply with text
+  // quick abstraction/wrapper to make it easier for tools to reply text instead of JSON
   const tool = (name: string, description: string, paramsSchema: ZodRawShape, cb: (args: z.objectOutputType<ZodRawShape, ZodTypeAny>) => Promise<string>) => {
 		const wrappedCb = async (args: ZodRawShape): Promise<CallToolResult> => {
 			try {
@@ -107,6 +108,23 @@ const main = async () => {
 					content: [{ type: "text", text: response }],
 				};
 			} catch (error: any) {
+        // check if it's an error originating from the Dynatrace SDK / API Gateway and provide an appropriate message to the user
+        if (isClientRequestError(error)) {
+          const e: ClientRequestError = error;
+          let additionalErrorInformation = '';
+          if (e.response.status == 403) {
+            additionalErrorInformation = 'Note: Your user or service-user is most likely lacking the necessary permissions/scopes for this API Call.'
+          }
+          return {
+            content: [{
+              type: "text",
+              text: `Client Request Error: ${e.message} with HTTP status: ${e.response.status}. ${additionalErrorInformation} (body: ${JSON.stringify(e.body)})` }
+            ],
+            isError: true,
+          };
+        }
+        // else: We don't know what kind of error happened - best-case we can provide error.message
+        console.log(error);
 				return {
 					content: [{ type: "text", text: `Error: ${error.message}` }],
 					isError: true,

@@ -1,8 +1,30 @@
 import { _OAuthHttpClient } from '@dynatrace-sdk/http-client';
 import { getSSOUrl } from 'dt-app';
 
-/** Uses the provided oauth Client ID and Secret and requests a token */
-const requestToken = async (clientId: string, clientSecret: string, authUrl: string, scopes: string[]): Promise<any> => {
+
+// {"errorCode":400,"message":"Bad Request","issueId":"<some-id>","error":"invalid_request","error_description":""}
+
+export interface OAuthTokenResponse {
+  scope?: string;
+  token_type?: string;
+  expires_in?: number;
+  access_token?: string;
+  errorCode?: number;
+  message?: string;
+  issueId?: string;
+  error?: string;
+  error_description?: string;
+}
+
+/**
+ * Uses the provided oauth Client ID and Secret and requests a token
+ * @param clientId - OAuth Client ID for Dynatrace
+ * @param clientSecret - Oauth Client Secret for Dynatrace
+ * @param authUrl - SSO Authentication URL
+ * @param scopes - List of requested scopes
+ * @returns
+ */
+const requestToken = async (clientId: string, clientSecret: string, authUrl: string, scopes: string[]): Promise<OAuthTokenResponse> => {
   const res = await fetch(authUrl, {
     method: 'POST',
     headers: {
@@ -15,9 +37,12 @@ const requestToken = async (clientId: string, clientSecret: string, authUrl: str
       scope: scopes.join(' '),
     }),
   });
+  // check if the response was okay (HTTP 2xx) or not (HTTP 4xx or 5xx)
   if (!res.ok) {
+    // log the error
     console.error(`Failed to fetch token: ${res.status} ${res.statusText}`);
   }
+  // and return the JSON result, as it contains additional information
   return await res.json();
 }
 
@@ -41,8 +66,10 @@ export const createOAuthClient = async (clientId: string, clientSecret: string, 
 
   // try to request a token, just to verify that everything is set up correctly
   const tokenResponse = await requestToken(clientId, clientSecret, ssoAuthUrl, scopes);
-  if (tokenResponse.error && tokenResponse.error_description) {
-    throw new Error(`Failed to retrieve OAuth token: ${tokenResponse.error} - ${tokenResponse.error_description}`);
+
+  // in case we didn't get a token, or error / error_description / issueId is set, we throw an error
+  if (!tokenResponse.access_token || tokenResponse.error || tokenResponse.error_description || tokenResponse.issueId) {
+    throw new Error(`Failed to retrieve OAuth token (IssueId: ${tokenResponse.issueId}): ${tokenResponse.error} - ${tokenResponse.error_description}. Note: Your OAuth client is most likely not configured correctly.`);
   }
   console.error(`Successfully retrieved token from SSO!`);
 
