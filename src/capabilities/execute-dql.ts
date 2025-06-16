@@ -1,5 +1,5 @@
 import { _OAuthHttpClient } from "@dynatrace-sdk/http-client";
-import { QueryExecutionClient, QueryAssistanceClient } from '@dynatrace-sdk/client-query';
+import { QueryExecutionClient, QueryAssistanceClient, QueryResult } from '@dynatrace-sdk/client-query';
 
 
 export const verifyDqlStatement = async (dtClient: _OAuthHttpClient, dqlStatement: string) => {
@@ -16,7 +16,7 @@ export const verifyDqlStatement = async (dtClient: _OAuthHttpClient, dqlStatemen
 };
 
 
-export const executeDql = async (dtClient: _OAuthHttpClient, dqlStatement: string) => {
+export const executeDql = async (dtClient: _OAuthHttpClient, dqlStatement: string): Promise<QueryResult['records'] | undefined> => {
   const queryExecutionClient = new QueryExecutionClient(dtClient);
 
   const response = await queryExecutionClient.queryExecute({
@@ -37,7 +37,7 @@ export const executeDql = async (dtClient: _OAuthHttpClient, dqlStatement: strin
       // sleep for 2 seconds
       await new Promise(resolve => setTimeout(resolve, 2000));
       pollResponse = await queryExecutionClient.queryPoll({
-        requestToken: response.requestToken,  
+        requestToken: response.requestToken,
       });
       // done - let's return it
       if (pollResponse.result) {
