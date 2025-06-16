@@ -8,6 +8,7 @@ import {
   CallToolRequestSchema,
   CallToolResult,
   ListToolsRequestSchema,
+  NotificationSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { config } from 'dotenv';
@@ -352,19 +353,37 @@ const main = async () => {
 
   tool(
     "verify_dql",
-    "Verify a DQL statement on Dynatrace",
+    "Verify a Dynatrace Query Language (DQL) statement on Dynatrace GRAIL before executing it. This is useful to ensure that the DQL statement is valid and can be executed without errors.",
     {
       dqlStatement: z.string()
     },
     async ({dqlStatement}) => {
       const response = await verifyDqlStatement(dtClient, dqlStatement);
-      return `Parsing DQL Statement resulted in: ${JSON.stringify(response)}`;
+
+      let resp = 'DQL Statement Verification:\n';
+
+      if (response.notifications && response.notifications.length > 0) {
+        resp += `Please consider the following notifications for adapting the your DQL statement:\n`;
+        response.notifications.forEach(
+          (notification) => {
+            resp += `* ${notification.severity}: ${notification.message}\n`;
+          }
+        );
+      }
+
+      if (response.valid) {
+        resp += `The DQL statement is valid - you can use the "execute_dql" tool.\n`;
+      } else {
+        resp += `The DQL statement is invalid. Please adapt your statement.\n`;
+      }
+
+      return resp;
     }
   )
 
   tool(
     "execute_dql",
-    "Get Logs, Metrics, Spans, Events from Dynatrace by executing a DQL statement. Please use verify_dql tool before you execute a DQL statement.",
+    'Get Logs, Metrics, Spans or Events from Dynatrace GRAIL by executing a Dynatrace Query Language (DQL) statement. Always use "verify_dql" tool before you execute a DQL statement. A valid statement looks like this: "fetch [logs, metrics, spans, events] | filter <some-filter> | summarize count(), by:{some-fields}. Adapt filters for certain attributes: `traceId` could be `trace_id` or `trace.id`.',
     {
       dqlStatement: z.string()
     },
