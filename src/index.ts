@@ -28,6 +28,7 @@ import { _OAuthHttpClient } from "@dynatrace-sdk/http-client";
 import { getVulnerabilityDetails } from "./capabilities/get-vulnerability-details";
 import { executeDql, verifyDqlStatement } from "./capabilities/execute-dql";
 import { sendSlackMessage } from "./capabilities/send-slack-message";
+import { findMonitoredEntityByName } from './capabilities/find-monitored-entity-by-name';
 
 config();
 
@@ -296,6 +297,18 @@ const main = async () => {
 
       return resp;
 		}
+  )
+
+  tool(
+    "find_entity_by_name",
+    "Get the entityId of a monitored entity based on the name of the entity on Dynatrace",
+    {
+      entityName: z.string()
+    },
+    async ({entityName}) => {
+      const entityResponse = await findMonitoredEntityByName(dtClient, entityName);
+      return entityResponse;
+    }
   )
 
   tool(
