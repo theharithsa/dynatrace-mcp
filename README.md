@@ -16,9 +16,10 @@ Bring real-time observability data directly into your development workflow.
 
 - List and get [problem](https://www.dynatrace.com/hub/detail/problems/) details from your services (for example Kubernetes)
 - List and get security problems / [vulnerability](https://www.dynatrace.com/hub/detail/vulnerabilities/) details
-- Execute DQL(Dynatrace Query Language) like getting events or logs
+- Execute DQL (Dynatrace Query Language) and retrieve logs, events, spans and metrics
 - Send Slack messages (via Slack Connector)
 - Set up notification Workflow (via Dynatrace [AutomationEngine](https://docs.dynatrace.com/docs/discover-dynatrace/platform/automationengine))
+- Get more information about a monitored entity
 - Get Ownership of an entity
 
 ## Quickstart
@@ -27,6 +28,8 @@ Bring real-time observability data directly into your development workflow.
 
 You can add this MCP server (using STDIO) to your MCP Client like VS Code, Claude, Cursor, Amazon Q Developer CLI, Windsurf Github Copilot via the package `@dynatrace-oss/dynatrace-mcp-server`.
 
+We recommend to always set it up for your current workspace instead of using it globally.
+
 **VS Code**
 
 ```json
@@ -34,6 +37,7 @@ You can add this MCP server (using STDIO) to your MCP Client like VS Code, Claud
   "servers": {
     "npx-dynatrace-mcp-server": {
       "command": "npx",
+      "cwd": "${workspaceFolder}",
       "args": ["-y", "@dynatrace-oss/dynatrace-mcp-server@latest"],
       "envFile": "${workspaceFolder}/.env"
     }
@@ -61,6 +65,7 @@ This only works if the config is stored in the current workspaces, e.g., `<your-
 ```
 
 **Claude Desktop**
+
 ```json
 {
   "mcpServers": {
@@ -80,6 +85,7 @@ This only works if the config is stored in the current workspaces, e.g., `<your-
 **Amazon Q Developer CLI**
 
 The [Amazon Q Developer CLI](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/command-line-mcp-configuration.html) provides an interactive chat experience directly in your terminal. You can ask questions, get help with AWS services, troubleshoot issues, and generate code snippets without leaving your command line environment.
+
 ```json
 {
   "mcpServers": {
@@ -95,6 +101,8 @@ The [Amazon Q Developer CLI](https://docs.aws.amazon.com/amazonq/latest/qdevelop
   }
 }
 ```
+
+This configuration should be stored in `<your-repo>/.amazonq/mcp.json`.
 
 ## Environment Variables
 
