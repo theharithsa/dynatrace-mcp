@@ -14,6 +14,7 @@ import {
 import { config } from 'dotenv';
 import { z, ZodRawShape, ZodTypeAny } from "zod";
 
+import { version as VERSION } from '../package.json';
 import { createOAuthClient } from "./dynatrace-clients";
 import { listVulnerabilities } from "./capabilities/list-vulnerabilities";
 import { listProblems } from "./capabilities/list-problems";
@@ -84,11 +85,11 @@ const main = async () => {
   // create an oauth-client
   const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopes);
 
-  console.error("Starting Dynatrace MCP Server...");
+  console.error(`Starting Dynatrace MCP Server v${VERSION}...`);
   const server = new McpServer(
     {
       name: "Dynatrace MCP Server",
-      version: "0.0.1", // ToDo: Read from package.json / hard-code?
+      version: VERSION,
     },
     {
       capabilities: {
