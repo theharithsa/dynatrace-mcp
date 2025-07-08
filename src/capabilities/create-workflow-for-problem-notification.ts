@@ -1,9 +1,15 @@
-import { _OAuthHttpClient } from "@dynatrace-sdk/http-client";
+import { _OAuthHttpClient } from '@dynatrace-sdk/http-client';
 import { MonitoredEntitiesClient } from '@dynatrace-sdk/client-classic-environment-v2';
-import { EventTriggerConfig, WorkflowCreate, WorkflowsClient } from "@dynatrace-sdk/client-automation";
-import { randomUUID } from "crypto";
+import { EventTriggerConfig, WorkflowCreate, WorkflowsClient } from '@dynatrace-sdk/client-automation';
+import { randomUUID } from 'crypto';
 
-export const createWorkflowForProblemNotification = async (dtClient: _OAuthHttpClient, teamName: string, channel: string, problemType: string, isPrivate: boolean) => {
+export const createWorkflowForProblemNotification = async (
+  dtClient: _OAuthHttpClient,
+  teamName: string,
+  channel: string,
+  problemType: string,
+  isPrivate: boolean,
+) => {
   const workflowsclient = new WorkflowsClient(dtClient);
 
   // Map problem types to categories
@@ -14,7 +20,7 @@ export const createWorkflowForProblemNotification = async (dtClient: _OAuthHttpC
     slowdown: false,
     resource: false,
     custom: false,
-    info: false
+    info: false,
   };
 
   // default trigger config
@@ -22,12 +28,12 @@ export const createWorkflowForProblemNotification = async (dtClient: _OAuthHttpC
     type: 'event',
     value: {
       eventType: 'events',
-      query: ''
-    }
+      query: '',
+    },
   };
 
   // special case: Security Problems
-  if (problemType.toUpperCase().indexOf("SECURITY") !== -1) {
+  if (problemType.toUpperCase().indexOf('SECURITY') !== -1) {
     triggerConfig.value.query = `event.kind=="SECURITY_EVENT"
         and event.type=="VULNERABILITY_STATUS_CHANGE_EVENT"
         and event.level == "ENTITY"
@@ -37,7 +43,7 @@ export const createWorkflowForProblemNotification = async (dtClient: _OAuthHttpC
         vulnerability.risk.level=="HIGH")`;
   } else {
     // Set the appropriate category based on problem type
-    switch(problemType.toUpperCase()) {
+    switch (problemType.toUpperCase()) {
       case 'MONITORING_UNAVAILABLE':
         categories.monitoringUnavailable = true;
         break;
@@ -69,11 +75,10 @@ export const createWorkflowForProblemNotification = async (dtClient: _OAuthHttpC
     triggerConfig = {
       type: 'davis-problem',
       value: {
-          categories
-      }
+        categories,
+      },
     };
   }
-
 
   let notificationWorkflow: WorkflowCreate = {
     title: `[MCP POC] Notify team ${teamName} on problem of type ${problemType}`,
@@ -82,28 +87,28 @@ export const createWorkflowForProblemNotification = async (dtClient: _OAuthHttpC
     type: 'SIMPLE',
     // define the send_notification task
     tasks: {
-        "send_notification": {
-            name: "Send notification",
-            action: "dynatrace.slack:slack-send-message",
-            description: "Sends a notification to a Slack channel",
-            input: {
-                connectionId: "slack-connection-id",
-                channel: `{{ \"${channel}\" }}`,
-                message: `🚨 Alert for Team ${teamName}\n*Problem Type*: ${problemType}\n*Problem ID*: {{ event()["display_id"] }}\n*Status*: {{ event()["event.status"] }}\n\n<{{ environment().url }}/ui/apps/dynatrace.davis.problems/problem/{{ event()["event.id"] }}|Click here for details>`,
-            },
-            active: true,
-        }
+      send_notification: {
+        name: 'Send notification',
+        action: 'dynatrace.slack:slack-send-message',
+        description: 'Sends a notification to a Slack channel',
+        input: {
+          connectionId: 'slack-connection-id',
+          channel: `{{ \"${channel}\" }}`,
+          message: `🚨 Alert for Team ${teamName}\n*Problem Type*: ${problemType}\n*Problem ID*: {{ event()["display_id"] }}\n*Status*: {{ event()["event.status"] }}\n\n<{{ environment().url }}/ui/apps/dynatrace.davis.problems/problem/{{ event()["event.id"] }}|Click here for details>`,
+        },
+        active: true,
+      },
     },
     // define a trigger
     trigger: {
-        eventTrigger: {
-            isActive: true,
-            triggerConfiguration: triggerConfig,
-        }
-    }
+      eventTrigger: {
+        isActive: true,
+        triggerConfiguration: triggerConfig,
+      },
+    },
   };
 
   return await workflowsclient.createWorkflow({
-    body: notificationWorkflow
+    body: notificationWorkflow,
   });
-}
+};

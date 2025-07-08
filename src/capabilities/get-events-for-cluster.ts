@@ -1,7 +1,5 @@
-import { _OAuthHttpClient } from "@dynatrace-sdk/http-client";
-import { executeDql } from "./execute-dql";
-
-
+import { _OAuthHttpClient } from '@dynatrace-sdk/http-client';
+import { executeDql } from './execute-dql';
 
 export const getEventsForCluster = async (dtClient: _OAuthHttpClient, clusterId: string) => {
   let dql = `fetch events | filter k8s.cluster.uid == "${clusterId}"`;

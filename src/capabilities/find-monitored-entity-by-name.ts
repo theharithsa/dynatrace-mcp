@@ -1,6 +1,5 @@
-import { _OAuthHttpClient } from "@dynatrace-sdk/http-client";
-import { executeDql } from "./execute-dql";
-
+import { _OAuthHttpClient } from '@dynatrace-sdk/http-client';
+import { executeDql } from './execute-dql';
 
 export const findMonitoredEntityByName = async (dtClient: _OAuthHttpClient, entityName: string) => {
   const dql = `fetch dt.entity.application | search "*${entityName}*" | fieldsAdd entity.type
@@ -23,5 +22,4 @@ export const findMonitoredEntityByName = async (dtClient: _OAuthHttpClient, enti
   } else {
     return 'No monitored entity found with the specified name.';
   }
-}
-
+};

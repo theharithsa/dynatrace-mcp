@@ -22,6 +22,7 @@ It is written in TypeScript and uses Node.js as its runtime. You need to underst
 ## Repo Structure
 
 The repository is structured as follows:
+
 - `src/`: Contains the source code for the MCP server.
 - `src/index.ts`: Main entrypoint of the MCP server. Defines tools and OAuth clients.
 - `src/capabilities/*.ts`: Contains the actual tool definition and implementation.
@@ -36,6 +37,7 @@ Please try to follow basic TypeScript and Node.js coding conventions. We will de
 ## Dependencies
 
 The following dependencies are allowed:
+
 - Core MCP SDK (`@modelcontextprotocol/sdk`),
 - environment utilities (`dotenv`),
 - ZOD schema validation (`zod-to-json-schema`),
@@ -61,5 +63,3 @@ The `dist/` folder contains the output of the build process.
   - Use semantic versioning (major.minor.patch)
   - Group changes by type (Added, Changed, Fixed, etc.)
   - Keep entries concise but descriptive
-
-
