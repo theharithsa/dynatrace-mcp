@@ -110,35 +110,35 @@ A **Dynatrace OAuth Client** is needed to communicate with your Dynatrace Enviro
 [creating an Oauth Client in Dynatrace](https://docs.dynatrace.com/docs/manage/identity-access-management/access-tokens-and-oauth-clients/oauth-clients),
 and set up the following environment variables in order for this MCP to work:
 
-* `DT_ENVIRONMENT` (string, e.g., https://abc12345.apps.dynatrace.com) - URL to your Dynatrace Platform (do not use Dynatrace classic URLs like `abc12345.live.dynatrace.com`)
-* `OAUTH_CLIENT_ID` (string, e.g., `dt0s02.SAMPLE`) - Dynatrace OAuth Client ID
-* `OAUTH_CLIENT_SECRET` (string, e.g., `dt0s02.SAMPLE.abcd1234`) - Dynatrace OAuth Client Secret
-* OAuth Client Scopes:
-  * `app-engine:apps:run` - needed for environmentInformationClient
-  * `app-engine:functions:run` - needed for environmentInformationClient
-  * `hub:catalog:read` - get details about installed Apps on Dynatrace Environment
-  * `environment-api:security-problems:read` - needed for reading security problems
-  * `environment-api:entities:read` - read monitored entities
-  * `environment-api:problems:read` - get problems
-  * `environment-api:metrics:read` - read metrics
-  * `environment-api:slo:read` - read SLOs
-  * `storage:buckets:read` - Read all system data stored on Grail
-  * `storage:logs:read` - Read logs for reliability guardian validations
-  * `storage:metrics:read` - Read metrics for reliability guardian validations
-  * `storage:bizevents:read` - Read bizevents for reliability guardian validations
-  * `storage:spans:read` - Read spans from Grail
-  * `storage:entities:read` - Read Entities from Grail
-  * `storage:events:read` -  Read Events from Grail
-  * `storage:system:read` - Read System Data from Grail
-  * `storage:user.events:read` - Read User events from Grail
-  * `storage:user.sessions:read` - Read User sessions from Grail
-  * `settings:objects:read` - needed for reading ownership information and Guardians (SRG) from settings
+- `DT_ENVIRONMENT` (string, e.g., https://abc12345.apps.dynatrace.com) - URL to your Dynatrace Platform (do not use Dynatrace classic URLs like `abc12345.live.dynatrace.com`)
+- `OAUTH_CLIENT_ID` (string, e.g., `dt0s02.SAMPLE`) - Dynatrace OAuth Client ID
+- `OAUTH_CLIENT_SECRET` (string, e.g., `dt0s02.SAMPLE.abcd1234`) - Dynatrace OAuth Client Secret
+- OAuth Client Scopes:
+  - `app-engine:apps:run` - needed for environmentInformationClient
+  - `app-engine:functions:run` - needed for environmentInformationClient
+  - `hub:catalog:read` - get details about installed Apps on Dynatrace Environment
+  - `environment-api:security-problems:read` - needed for reading security problems
+  - `environment-api:entities:read` - read monitored entities
+  - `environment-api:problems:read` - get problems
+  - `environment-api:metrics:read` - read metrics
+  - `environment-api:slo:read` - read SLOs
+  - `storage:buckets:read` - Read all system data stored on Grail
+  - `storage:logs:read` - Read logs for reliability guardian validations
+  - `storage:metrics:read` - Read metrics for reliability guardian validations
+  - `storage:bizevents:read` - Read bizevents for reliability guardian validations
+  - `storage:spans:read` - Read spans from Grail
+  - `storage:entities:read` - Read Entities from Grail
+  - `storage:events:read` - Read Events from Grail
+  - `storage:system:read` - Read System Data from Grail
+  - `storage:user.events:read` - Read User events from Grail
+  - `storage:user.sessions:read` - Read User sessions from Grail
+  - `settings:objects:read` - needed for reading ownership information and Guardians (SRG) from settings
 
-    **Note**: Please ensure that `settings:objects:read` is used, and *not* the similarly named scope `app-settings:objects:read`.
+    **Note**: Please ensure that `settings:objects:read` is used, and _not_ the similarly named scope `app-settings:objects:read`.
 
 In addition, depending on the features you use, the following variables can be configured:
 
-* `SLACK_CONNECTION_ID` (string) - connection ID of a [Slack Connection](https://docs.dynatrace.com/docs/analyze-explore-automate/workflows/actions/slack)
+- `SLACK_CONNECTION_ID` (string) - connection ID of a [Slack Connection](https://docs.dynatrace.com/docs/analyze-explore-automate/workflows/actions/slack)
 
 ## ✨ Example prompts ✨
 
@@ -146,32 +146,41 @@ Use these example prompts as a starting point. Just copy them into your IDE or a
 and extend them as needed. They’re here to help you imagine how real-time observability and automation work together in the MCP context in your IDE.
 
 **Find open vulnerabilities on production, setup alert.**
+
 ```
 I have this code snippet here in my IDE, where I get a dependency vulnerability warning for my code.
 Check if I see any open vulnerability/cve on production.
 Analyze a specific production problem.
 Setup a workflow that sends Slack alerts to the #devops-alerts channel when availability problems occur.
 ```
+
 **Debug intermittent 503 errors.**
+
 ```
 Our load balancer is intermittently returning 503 errors during peak traffic.
 Pull all recent problems detected for our front-end services and
 run a query to correlate error rates with service instance health indicators.
 I suspect we have circuit breakers triggering, but need confirmation from the telemetry data.
 ```
+
 **Correlate memory issue with logs.**
+
 ```
 There's a problem with high memory usage on one of our hosts.
 Get the problem details and then fetch related logs to help understand
 what's causing the memory spike? Which file in this repo is this related to?
 ```
+
 **Trace request flow analysis.**
+
 ```
 Our users are experiencing slow checkout processes.
 Can you execute a DQL query to show me the full request trace for our checkout flow,
 so I can identify which service is causing the bottleneck?
 ```
+
 **Analyze Kubernetes cluster events.**
+
 ```
 Our application deployments seem to be failing intermittently.
 Can you fetch recent events from our "production-cluster"
@@ -190,6 +199,7 @@ In case of any problems, you can troubleshoot SSO/OAuth issues based on our [Dyn
 It is recommended to try access the following API (which requires minimal scopes `app-engine:apps:run` and `app-engine:functions:run`):
 
 1. Use OAuth Client ID and Secret to retrieve a Bearer Token (only valid for a couple of minutes):
+
 ```bash
 curl --request POST 'https://sso.dynatrace.com/sso/oauth2/token' \
   --header 'Content-Type: application/x-www-form-urlencoded' \
@@ -200,6 +210,7 @@ curl --request POST 'https://sso.dynatrace.com/sso/oauth2/token' \
 ```
 
 2. Use `access_token` from the response of the above call as the bearer-token in the next call:
+
 ```bash
 curl -X GET https://abc12345.apps.dynatrace.com/platform/management/v1/environment \
   -H 'accept: application/json' \
@@ -207,6 +218,7 @@ curl -X GET https://abc12345.apps.dynatrace.com/platform/management/v1/environme
 ```
 
 3. You should retrieve a result like this:
+
 ```json
 {
   "environmentId": "abc12345",
@@ -216,35 +228,32 @@ curl -X GET https://abc12345.apps.dynatrace.com/platform/management/v1/environme
 }
 ```
 
-
 ### Problem accessing data on Grail
 
 Grail has a dedicated section about permissions in the Dynatrace Docs. Please refer to https://docs.dynatrace.com/docs/discover-dynatrace/platform/grail/data-model/assign-permissions-in-grail for more details.
-
 
 ## Development
 
 For local development purposes, you can use VSCode and GitHub Copilot.
 
 First, enable Copilot for your Workspace `.vscode/settings.json`:
+
 ```json
 {
   "github.copilot.enable": {
     "*": true
   }
 }
-
 ```
 
 Second, add the MCP to `.vscode/mcp.json`:
+
 ```json
 {
   "servers": {
     "my-dynatrace-mcp-server": {
       "command": "node",
-      "args": [
-        "${workspaceFolder}/dist/index.js"
-      ],
+      "args": ["${workspaceFolder}/dist/index.js"],
       "envFile": "${workspaceFolder}/.env"
     }
   }
@@ -255,7 +264,7 @@ Third, create a `.env` file in this repository (you can copy from `.env.template
 
 Last but not least, switch to Agent Mode in CoPilot and reload tools.
 
-
 ## Notes
+
 This product is not officially supported by Dynatrace.
 Please contact us via [GitHub Issues](https://github.com/dynatrace-oss/dynatrace-mcp/issues) if you have feature requests, questions, or need help.

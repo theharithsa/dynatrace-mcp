@@ -28,6 +28,7 @@ git push origin vx.y.z
 ```
 
 After pushing the tag, the workflow will automatically:
+
 1. Run tests
 2. Build the project
 3. Generate release notes from commit history

@@ -1,4 +1,9 @@
-import { _OAuthHttpClient, HttpClientRequestOptions, HttpClientResponse, RequestBodyTypes } from '@dynatrace-sdk/http-client';
+import {
+  _OAuthHttpClient,
+  HttpClientRequestOptions,
+  HttpClientResponse,
+  RequestBodyTypes,
+} from '@dynatrace-sdk/http-client';
 import { getSSOUrl } from 'dt-app';
 import { version as VERSION } from '../package.json';
 
@@ -23,7 +28,12 @@ export interface OAuthTokenResponse {
  * @param scopes - List of requested scopes
  * @returns
  */
-const requestToken = async (clientId: string, clientSecret: string, authUrl: string, scopes: string[]): Promise<OAuthTokenResponse> => {
+const requestToken = async (
+  clientId: string,
+  clientSecret: string,
+  authUrl: string,
+  scopes: string[],
+): Promise<OAuthTokenResponse> => {
   const res = await fetch(authUrl, {
     method: 'POST',
     headers: {
@@ -43,19 +53,22 @@ const requestToken = async (clientId: string, clientSecret: string, authUrl: str
   }
   // and return the JSON result, as it contains additional information
   return await res.json();
-}
+};
 
 /**
  * ExtendedOAuthClient that takes parameters for clientId, secret, scopes, environmentUrl, authUrl, and the version of the dynatrace-mcp-server
  */
 export class ExtendedOauthClient extends _OAuthHttpClient {
-  constructor(config: {
-    clientId: string;
-    secret: string;
-    scopes: string[];
-    environmentUrl: string;
-    authUrl: string;
-  }, protected userAgent: string) {
+  constructor(
+    config: {
+      clientId: string;
+      secret: string;
+      scopes: string[];
+      environmentUrl: string;
+      authUrl: string;
+    },
+    protected userAgent: string,
+  ) {
     super(config);
   }
 
@@ -70,9 +83,13 @@ export class ExtendedOauthClient extends _OAuthHttpClient {
   }
 }
 
-
 /** Create an Oauth Client based on clientId, clientSecret, environmentUrl and scopes */
-export const createOAuthClient = async (clientId: string, clientSecret: string, environmentUrl: string, scopes: string[]): Promise<_OAuthHttpClient> => {
+export const createOAuthClient = async (
+  clientId: string,
+  clientSecret: string,
+  environmentUrl: string,
+  scopes: string[],
+): Promise<_OAuthHttpClient> => {
   if (!clientId) {
     throw new Error('Failed to retrieve OAuth client id from env "DT_APP_OAUTH_CLIENT_ID"');
   }
@@ -94,23 +111,33 @@ export const createOAuthClient = async (clientId: string, clientSecret: string, 
 
   // in case we didn't get a token, or error / error_description / issueId is set, we throw an error
   if (!tokenResponse.access_token || tokenResponse.error || tokenResponse.error_description || tokenResponse.issueId) {
-    throw new Error(`Failed to retrieve OAuth token (IssueId: ${tokenResponse.issueId}): ${tokenResponse.error} - ${tokenResponse.error_description}. Note: Your OAuth client is most likely not configured correctly.`);
+    throw new Error(
+      `Failed to retrieve OAuth token (IssueId: ${tokenResponse.issueId}): ${tokenResponse.error} - ${tokenResponse.error_description}. Note: Your OAuth client is most likely not configured correctly.`,
+    );
   }
   console.error(`Successfully retrieved token from SSO!`);
 
-  const userAgent = `dynatrace-mcp-server/v${VERSION} (${process.platform}-${process.arch})`
+  const userAgent = `dynatrace-mcp-server/v${VERSION} (${process.platform}-${process.arch})`;
 
-  return new ExtendedOauthClient({
-    scopes,
-    clientId,
-    secret: clientSecret,
-    environmentUrl,
-    authUrl: ssoAuthUrl,
-  }, userAgent);
+  return new ExtendedOauthClient(
+    {
+      scopes,
+      clientId,
+      secret: clientSecret,
+      environmentUrl,
+      authUrl: ssoAuthUrl,
+    },
+    userAgent,
+  );
 };
 
 /** Helper function to call an app-function via platform-api */
-export const callAppFunction = async (dtClient: _OAuthHttpClient, appId: string, functionName: string, payload: any) => {
+export const callAppFunction = async (
+  dtClient: _OAuthHttpClient,
+  appId: string,
+  functionName: string,
+  payload: any,
+) => {
   console.error(`Sending payload ${JSON.stringify(payload)}`);
 
   const response = await dtClient.send({
@@ -127,4 +154,4 @@ export const callAppFunction = async (dtClient: _OAuthHttpClient, appId: string,
   });
 
   return await response.body('json');
-}
+};
