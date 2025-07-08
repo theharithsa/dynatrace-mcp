@@ -34,42 +34,10 @@ import { DynatraceEnv, getDynatraceEnv } from "./getDynatraceEnv";
 
 config();
 
-let scopes = [
+let scopesBase = [
   'app-engine:apps:run', // needed for environmentInformationClient
   'app-engine:functions:run', // needed for environmentInformationClient
-  'hub:catalog:read', // get details about installed Apps on Dynatrace Environment
-
-  'environment-api:security-problems:read', // needed for reading security problems
-  'environment-api:entities:read', // read monitored entities
-  'environment-api:problems:read', // get problems
-  'environment-api:metrics:read', // read metrics
-  'environment-api:slo:read', // read SLOs
-  'settings:objects:read', // needed for reading settings objects, like ownership information and Guardians (SRG) from settings
-  // 'settings:objects:write', // [OPTIONAL] not used right now
-
-  // Grail related permissions: https://docs.dynatrace.com/docs/discover-dynatrace/platform/grail/data-model/assign-permissions-in-grail
-  'storage:buckets:read', // Read all system data stored on Grail
-  'storage:logs:read', // Read logs for reliability guardian validations
-  'storage:metrics:read', // Read metrics for reliability guardian validations
-  'storage:bizevents:read', // Read bizevents for reliability guardian validations
-  'storage:spans:read', // Read spans from Grail
-  'storage:entities:read', // Read Entities from Grail
-  'storage:events:read', // Read events from Grail
-  'storage:system:read', // Read System Data from Grail
-  'storage:user.events:read', // Read User events from Grail
-  'storage:user.sessions:read', // Read User sessions from Grail
 ];
-
-// configurable call for app settings scope (not available on all environments)
-if (process.env.USE_APP_SETTINGS) {
-  scopes.push('app-settings:objects:read'); // needed when using app settings in Workflows, see below
-}
-
-if (process.env.USE_WORKFLOWS) {
-  scopes.push('automation:workflows:read'); // read workflows
-  scopes.push('automation:workflows:write'); // write workflows
-  scopes.push('automation:workflows:run'); // execute workflows
-}
 
 const main = async () => {
   // read Environment variables
@@ -81,9 +49,6 @@ const main = async () => {
     process.exit(1);
   }
   const { oauthClient, oauthClientSecret, dtEnvironment, slackConnectionId } = dynatraceEnv;
-
-  // create an oauth-client
-  const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopes);
 
   console.error(`Starting Dynatrace MCP Server v${VERSION}...`);
   const server = new McpServer(
@@ -139,6 +104,8 @@ const main = async () => {
     "Get information about the connected Dynatrace Environment (Tenant)",
     {},
     async({}) => {
+        // create an oauth-client
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase);
       const environmentInformationClient = new EnvironmentInformationClient(dtClient);
 
       const environmentInfo = await environmentInformationClient.getEnvironmentInformation();
@@ -156,6 +123,7 @@ const main = async () => {
 		"List all vulnerabilities from Dynatrace",
 		{},
 		async ({}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("environment-api:security-problems:read"));
 			const result = await listVulnerabilities(dtClient);
       if (!result || result.length === 0) {
         return "No vulnerabilities found";
@@ -181,6 +149,7 @@ const main = async () => {
       securityProblemId: z.string().optional()
     },
     async ({securityProblemId}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("environment-api:security-problems:read"));
       const result = await getVulnerabilityDetails(dtClient, securityProblemId);
 
       let resp = `The Security Problem (Vulnerability) ${result.displayId} with securityProblemId ${result.securityProblemId} has the title ${result.title}.\n`;
@@ -249,6 +218,7 @@ const main = async () => {
     {
     },
     async ({}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("environment-api:problems:read"));
 			const result = await listProblems(dtClient);
       if (!result || result.length === 0) {
         return "No problems found";
@@ -264,6 +234,7 @@ const main = async () => {
       problemId: z.string().optional()
     },
     async ({problemId}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("environment-api:problems:read"));
 			const result = await getProblemDetails(dtClient, problemId);
 
 			let resp = `The problem ${result.displayId} with the title ${result.title} (ID: ${result.problemId}).` +
@@ -303,6 +274,7 @@ const main = async () => {
       entityName: z.string()
     },
     async ({entityName}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("environment-api:entities:read", "storage:entities:read"));
       const entityResponse = await findMonitoredEntityByName(dtClient, entityName);
       return entityResponse;
     }
@@ -315,6 +287,7 @@ const main = async () => {
       entityId: z.string().optional()
     },
     async ({entityId}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("environment-api:entities:read"));
       const entityDetails = await getMonitoredEntityDetails(dtClient, entityId);
 
       let resp =  `Entity ${entityDetails.displayName} of type ${entityDetails.type} with \`entityId\` ${entityDetails.entityId}\n` +
@@ -342,6 +315,7 @@ const main = async () => {
       message: z.string().optional()
     },
     async ({channel, message}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("app-settings:objects:read"));
       const response = await sendSlackMessage(dtClient, slackConnectionId, channel, message);
 
       return `Message sent to Slack channel: ${JSON.stringify(response)}`;
@@ -355,6 +329,7 @@ const main = async () => {
       entityName: z.string().optional()
     },
     async ({entityName}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("storage:logs:read"));
       const logs = await getLogsForEntity(dtClient, entityName);
 
       return `Logs:\n${JSON.stringify(logs?.map(logLine => logLine?logLine.content:'Empty log'))}`;
@@ -368,6 +343,7 @@ const main = async () => {
       dqlStatement: z.string()
     },
     async ({dqlStatement}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase);
       const response = await verifyDqlStatement(dtClient, dqlStatement);
 
       let resp = 'DQL Statement Verification:\n';
@@ -398,6 +374,23 @@ const main = async () => {
       dqlStatement: z.string()
     },
     async ({dqlStatement}) => {
+      const dtClient = await createOAuthClient(
+        oauthClient, 
+        oauthClientSecret, 
+        dtEnvironment, 
+        scopesBase.concat(
+          'storage:buckets:read', // Read all system data stored on Grail
+          'storage:logs:read', // Read logs for reliability guardian validations
+          'storage:metrics:read', // Read metrics for reliability guardian validations
+          'storage:bizevents:read', // Read bizevents for reliability guardian validations
+          'storage:spans:read', // Read spans from Grail
+          'storage:entities:read', // Read Entities from Grail
+          'storage:events:read', // Read events from Grail
+          'storage:system:read', // Read System Data from Grail
+          'storage:user.events:read', // Read User events from Grail
+          'storage:user.sessions:read' // Read User sessions from Grail
+        )
+      );
       const response = await executeDql(dtClient, dqlStatement);
 
       return `DQL Response: ${JSON.stringify(response)}`;
@@ -415,6 +408,11 @@ const main = async () => {
       isPrivate: z.boolean().optional().default(false)
     },
     async ({problemType, teamName, channel, isPrivate}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat(
+        "automation:workflows:write",
+        "automation:workflows:read",
+        "automation:workflows:run"
+      ));
       const response = await createWorkflowForProblemNotification(dtClient, teamName, channel, problemType, isPrivate);
 
       let resp = `Workflow Created: ${response?.id} with name ${response?.title}.\nYou can access the Workflow via the following link: ${dtEnvironment}/ui/apps/dynatrace.automations/workflows/${response?.id}.\nTell the user to inspect the Workflow by visiting the link.\n`;
@@ -440,6 +438,11 @@ const main = async () => {
       workflowId: z.string().optional()
     },
     async ({workflowId}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat(
+        "automation:workflows:write",
+        "automation:workflows:read",
+        "automation:workflows:run"
+      ));
       const response = await updateWorkflow(dtClient, workflowId, {
         isPrivate: false,
       });
@@ -455,6 +458,7 @@ const main = async () => {
       clusterId: z.string().optional().describe(`The Kubernetes (K8s) Cluster Id, referred to as k8s.cluster.uid (this is NOT the Dynatrace environment)`)
     },
     async ({clusterId}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("storage:events:read"));
       const events = await getEventsForCluster(dtClient, clusterId);
 
       return `Kubernetes Events:\n${JSON.stringify(events)}`;
@@ -468,6 +472,7 @@ const main = async () => {
       entityIds: z.string().optional().describe("Comma separated list of entityIds"),
     },
     async ({entityIds}) => {
+      const dtClient = await createOAuthClient(oauthClient, oauthClientSecret, dtEnvironment, scopesBase.concat("environment-api:entities:read", "settings:objects:read"));
       console.error(`Fetching ownership for ${entityIds}`);
       const ownershipInformation = await getOwnershipInformation(dtClient, entityIds);
       console.error(`Done!`);
