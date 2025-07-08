@@ -139,10 +139,6 @@ and set up the following environment variables in order for this MCP to work:
 In addition, depending on the features you use, the following variables can be configured:
 
 * `SLACK_CONNECTION_ID` (string) - connection ID of a [Slack Connection](https://docs.dynatrace.com/docs/analyze-explore-automate/workflows/actions/slack)
-* `USE_APP_SETTINGS`  (boolean, `true` or `false`; default: `false`)
-  * Requires scope `app-settings:objects:read` to read settings-objects from app settings
-* `USE_WORKFLOWS` (boolean, `true` or `false`; default: `false`)
-  * Requires scopes `automation:workflows:read`, `automation:workflows:write` and `automation:workflows:run` to read, write and execute Workflows
 
 ## ✨ Example prompts ✨
 
