@@ -475,7 +475,7 @@ const main = async () => {
       }
 
       resp += `\n💡 **Next Steps:**\n`;
-      resp += `1. Use "execute_dql" tool to run the query (you can ommit running the "verify_dql" tool)\n`;
+      resp += `1. Use "execute_dql" tool to run the query (you can omit running the "verify_dql" tool)\n`;
       resp += `2. If results don't match expectations, refine your natural language description and try again\n`;
 
       return resp;
