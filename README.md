@@ -207,6 +207,36 @@ The [Amazon Q Developer CLI](https://docs.aws.amazon.com/amazonq/latest/qdevelop
 
 This configuration should be stored in `<your-repo>/.amazonq/mcp.json`.
 
+### HTTP Server Mode (Alternative)
+
+For scenarios where you need to run the MCP server as an HTTP service instead of using stdio (e.g., for stateful sessions, load balancing, or integration with web clients), you can use the HTTP server mode:
+
+**Running as HTTP server:**
+
+```bash
+# Run with HTTP server on default port 3000
+npx -y @dynatrace-oss/dynatrace-mcp-server --http
+
+# Run with custom port
+npx -y @dynatrace-oss/dynatrace-mcp-server --server --port 8080
+
+# Or specify exact port
+npx -y @dynatrace-oss/dynatrace-mcp-server --http --port 3001
+```
+
+**Configuration for MCP clients that support HTTP transport:**
+
+```json
+{
+  "mcpServers": {
+    "dynatrace-http": {
+      "url": "http://localhost:3000",
+      "transport": "http"
+    }
+  }
+}
+```
+
 ### Rule File
 
 For efficient result retrieval from Dynatrace, please consider creating a rule file (e.g., [.github/copilot-instructions.md](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions), [.amazonq/rules/](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/context-project-rules.html)), instructing coding agents on how to get more details for your component/app/service. Here is an example for [easytrade](https://github.com/Dynatrace/easytrade), please adapt the names and filters to fit your use-cases and components:
