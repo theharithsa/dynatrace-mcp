@@ -731,11 +731,13 @@ const main = async () => {
     .option('--http', 'enable HTTP server mode instead of stdio')
     .option('--server', 'enable HTTP server mode (alias for --http)')
     .option('-p, --port <number>', 'port for HTTP server', '3000')
+    .option('-H, --host <host>', 'host for HTTP server', '0.0.0.0')
     .parse();
 
   const options = program.opts();
   const httpMode = options.http || options.server;
   const httpPort = parseInt(options.port, 10);
+  const host = options.host || '0.0.0.0';
 
   if (httpMode) {
     // HTTP server mode
@@ -767,8 +769,9 @@ const main = async () => {
     console.error('Connecting server to HTTP transport...');
     await server.connect(httpTransport);
 
-    httpServer.listen(httpPort, () => {
-      console.error(`Dynatrace MCP Server running on HTTP at http://localhost:${httpPort}`);
+    // Start HTTP Server on the specified host and port
+    httpServer.listen(httpPort, host, () => {
+      console.error(`Dynatrace MCP Server running on HTTP at http://${host}:${httpPort}`);
     });
 
     // Handle graceful shutdown

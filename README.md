@@ -224,8 +224,25 @@ npx -y @dynatrace-oss/dynatrace-mcp-server --http
 npx -y @dynatrace-oss/dynatrace-mcp-server --server -p 8080
 npx -y @dynatrace-oss/dynatrace-mcp-server --http --port 3001
 
+# Run with custom host/IP (using short or long flag)
+npx -y @dynatrace-oss/dynatrace-mcp-server --http --host 127.0.0.1
+npx -y @dynatrace-oss/dynatrace-mcp-server --http -H 192.168.0.1
+
 # Check version
 npx -y @dynatrace-oss/dynatrace-mcp-server --version
+```
+
+**Configuration for MCP clients that support HTTP transport:**
+
+```json
+{
+  "mcpServers": {
+    "dynatrace-http": {
+      "url": "http://localhost:3000",
+      "transport": "http"
+    }
+  }
+}
 ```
 
 **Configuration for MCP clients that support HTTP transport:**
