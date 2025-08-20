@@ -1,5 +1,11 @@
 # @dynatrace-oss/dynatrace-mcp-server
 
+## Unreleased Changes
+
+### Added
+
+- Added Streamable HTTP transport support with `--http`/`--server`, `--port`, and `--host` arguments (default remains stdio for backward compatibility)
+
 ## 0.5.0 (Release Candidate 3)
 
 - Improved `list_vulnerabilities` tool to use DQL statement instead of classic API, and aligned parameters with `list_problems` tool

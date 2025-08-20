@@ -7,6 +7,7 @@ import {
   isClientRequestError,
 } from '@dynatrace-sdk/shared-errors';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import {
   CallToolRequest,
@@ -17,6 +18,9 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { config } from 'dotenv';
+import { createServer, IncomingMessage, ServerResponse } from 'node:http';
+import { randomUUID } from 'node:crypto';
+import { Command } from 'commander';
 import { z, ZodRawShape, ZodTypeAny } from 'zod';
 
 import { version as VERSION } from '../package.json';
@@ -717,12 +721,75 @@ const main = async () => {
     },
   );
 
-  const transport = new StdioServerTransport();
+  // Parse command line arguments using commander
+  const program = new Command();
 
-  console.error('Connecting server to transport...');
-  await server.connect(transport);
+  program
+    .name('dynatrace-mcp-server')
+    .description('Dynatrace Model Context Protocol (MCP) Server')
+    .version(VERSION)
+    .option('--http', 'enable HTTP server mode instead of stdio')
+    .option('--server', 'enable HTTP server mode (alias for --http)')
+    .option('-p, --port <number>', 'port for HTTP server', '3000')
+    .option('-H, --host <host>', 'host for HTTP server', '0.0.0.0')
+    .parse();
 
-  console.error('Dynatrace MCP Server running on stdio');
+  const options = program.opts();
+  const httpMode = options.http || options.server;
+  const httpPort = parseInt(options.port, 10);
+  const host = options.host || '0.0.0.0';
+
+  if (httpMode) {
+    // HTTP server mode
+    const httpTransport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+    });
+
+    const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+      // Parse request body for POST requests
+      let body: unknown;
+      if (req.method === 'POST') {
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const rawBody = Buffer.concat(chunks).toString();
+        try {
+          body = JSON.parse(rawBody);
+        } catch (error) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON' }));
+          return;
+        }
+      }
+
+      await httpTransport.handleRequest(req, res, body);
+    });
+
+    console.error('Connecting server to HTTP transport...');
+    await server.connect(httpTransport);
+
+    // Start HTTP Server on the specified host and port
+    httpServer.listen(httpPort, host, () => {
+      console.error(`Dynatrace MCP Server running on HTTP at http://${host}:${httpPort}`);
+    });
+
+    // Handle graceful shutdown
+    process.on('SIGINT', () => {
+      console.error('Shutting down HTTP server...');
+      httpServer.close(() => {
+        process.exit(0);
+      });
+    });
+  } else {
+    // Default stdio mode
+    const transport = new StdioServerTransport();
+
+    console.error('Connecting server to transport...');
+    await server.connect(transport);
+
+    console.error('Dynatrace MCP Server running on stdio');
+  }
 };
 
 main().catch((error) => {

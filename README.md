@@ -207,6 +207,57 @@ The [Amazon Q Developer CLI](https://docs.aws.amazon.com/amazonq/latest/qdevelop
 
 This configuration should be stored in `<your-repo>/.amazonq/mcp.json`.
 
+### HTTP Server Mode (Alternative)
+
+For scenarios where you need to run the MCP server as an HTTP service instead of using stdio (e.g., for stateful sessions, load balancing, or integration with web clients), you can use the HTTP server mode:
+
+**Running as HTTP server:**
+
+```bash
+# Get help and see all available options
+npx -y @dynatrace-oss/dynatrace-mcp-server --help
+
+# Run with HTTP server on default port 3000
+npx -y @dynatrace-oss/dynatrace-mcp-server --http
+
+# Run with custom port (using short or long flag)
+npx -y @dynatrace-oss/dynatrace-mcp-server --server -p 8080
+npx -y @dynatrace-oss/dynatrace-mcp-server --http --port 3001
+
+# Run with custom host/IP (using short or long flag)
+npx -y @dynatrace-oss/dynatrace-mcp-server --http --host 127.0.0.1
+npx -y @dynatrace-oss/dynatrace-mcp-server --http -H 192.168.0.1
+
+# Check version
+npx -y @dynatrace-oss/dynatrace-mcp-server --version
+```
+
+**Configuration for MCP clients that support HTTP transport:**
+
+```json
+{
+  "mcpServers": {
+    "dynatrace-http": {
+      "url": "http://localhost:3000",
+      "transport": "http"
+    }
+  }
+}
+```
+
+**Configuration for MCP clients that support HTTP transport:**
+
+```json
+{
+  "mcpServers": {
+    "dynatrace-http": {
+      "url": "http://localhost:3000",
+      "transport": "http"
+    }
+  }
+}
+```
+
 ### Rule File
 
 For efficient result retrieval from Dynatrace, please consider creating a rule file (e.g., [.github/copilot-instructions.md](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions), [.amazonq/rules/](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/context-project-rules.html)), instructing coding agents on how to get more details for your component/app/service. Here is an example for [easytrade](https://github.com/Dynatrace/easytrade), please adapt the names and filters to fit your use-cases and components:
