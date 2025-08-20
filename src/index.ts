@@ -20,6 +20,7 @@ import {
 import { config } from 'dotenv';
 import { createServer, IncomingMessage, ServerResponse } from 'node:http';
 import { randomUUID } from 'node:crypto';
+import { Command } from 'commander';
 import { z, ZodRawShape, ZodTypeAny } from 'zod';
 
 import { version as VERSION } from '../package.json';
@@ -720,10 +721,21 @@ const main = async () => {
     },
   );
 
-  // Parse command line arguments to determine transport mode
-  const args = process.argv.slice(2);
-  const httpMode = args.includes('--http') || args.includes('--server');
-  const httpPort = getPortFromArgs(args) || 3000;
+  // Parse command line arguments using commander
+  const program = new Command();
+
+  program
+    .name('dynatrace-mcp-server')
+    .description('Dynatrace Model Context Protocol (MCP) Server')
+    .version(VERSION)
+    .option('--http', 'enable HTTP server mode instead of stdio')
+    .option('--server', 'enable HTTP server mode (alias for --http)')
+    .option('-p, --port <number>', 'port for HTTP server', '3000')
+    .parse();
+
+  const options = program.opts();
+  const httpMode = options.http || options.server;
+  const httpPort = parseInt(options.port, 10);
 
   if (httpMode) {
     // HTTP server mode
@@ -776,25 +788,6 @@ const main = async () => {
     console.error('Dynatrace MCP Server running on stdio');
   }
 };
-
-// Helper function to extract port from command line arguments
-function getPortFromArgs(args: string[]): number | undefined {
-  const portIndex = args.findIndex((arg) => arg === '--port' || arg === '-p');
-  if (portIndex !== -1 && portIndex + 1 < args.length) {
-    const port = parseInt(args[portIndex + 1], 10);
-    return isNaN(port) ? undefined : port;
-  }
-
-  // Also check for --port=XXXX format
-  for (const arg of args) {
-    if (arg.startsWith('--port=')) {
-      const port = parseInt(arg.split('=')[1], 10);
-      return isNaN(port) ? undefined : port;
-    }
-  }
-
-  return undefined;
-}
 
 main().catch((error) => {
   console.error('Fatal error in main():', error);

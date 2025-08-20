@@ -214,14 +214,18 @@ For scenarios where you need to run the MCP server as an HTTP service instead of
 **Running as HTTP server:**
 
 ```bash
+# Get help and see all available options
+npx -y @dynatrace-oss/dynatrace-mcp-server --help
+
 # Run with HTTP server on default port 3000
 npx -y @dynatrace-oss/dynatrace-mcp-server --http
 
-# Run with custom port
-npx -y @dynatrace-oss/dynatrace-mcp-server --server --port 8080
-
-# Or specify exact port
+# Run with custom port (using short or long flag)
+npx -y @dynatrace-oss/dynatrace-mcp-server --server -p 8080
 npx -y @dynatrace-oss/dynatrace-mcp-server --http --port 3001
+
+# Check version
+npx -y @dynatrace-oss/dynatrace-mcp-server --version
 ```
 
 **Configuration for MCP clients that support HTTP transport:**
