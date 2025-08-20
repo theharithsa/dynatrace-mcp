@@ -733,7 +733,7 @@ const main = async () => {
 
     const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse) => {
       // Parse request body for POST requests
-      let body: unknown = undefined;
+      let body: unknown;
       if (req.method === 'POST') {
         const chunks: Buffer[] = [];
         for await (const chunk of req) {
