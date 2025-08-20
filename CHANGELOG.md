@@ -2,9 +2,11 @@
 
 ## Unreleased Changes
 
-### Added
+## 0.5.0 (Release Candidate 4)
 
 - Added Streamable HTTP transport support with `--http`/`--server`, `--port`, and `--host` arguments (default remains stdio for backward compatibility)
+- Adapted `find_entity_by_name` tool to include all entities from the smartscape topology.
+- Optimized `get_monitored_entity_details` tool to use direct entity type lookup for better performance
 
 ## 0.5.0 (Release Candidate 3)
 
@@ -20,8 +22,6 @@
 - Removed unneeded scopes `environment-api:slo:read` (no tool is using this) and `environment-api:metrics:read` (anyway handled via execute DQL tool)
 - Removed `metrics` from `execute_dql` example with `fetch`.
 - Clarified usage of `verify_dql` to avoid unnecessary tool calls.
-- Adapted `find_entity_by_name` tool to include all entities from the smartscape topology.
-- Optimized `get_monitored_entity_details` tool to use direct entity type lookup for better performance
 
 ## 0.5.0 (Release Candidate 2)
 
