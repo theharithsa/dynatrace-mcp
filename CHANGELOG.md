@@ -5,8 +5,8 @@
 ## 0.5.0 (Release Candidate 4)
 
 - Added Streamable HTTP transport support with `--http`/`--server`, `--port`, and `--host` arguments (default remains stdio for backward compatibility)
-- Adapted `find_entity_by_name` tool to include all entities from the smartscape topology.
-- Optimized `get_monitored_entity_details` tool to use direct entity type lookup for better performance
+- Adapted `find_entity_by_name` tool to include all entities from the Smartscape topology.
+- Optimized `get_monitored_entity_details` tool to use direct entity type lookup for better performance.
 
 ## 0.5.0 (Release Candidate 3)
 
