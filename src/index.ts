@@ -29,7 +29,6 @@ import { listVulnerabilities } from './capabilities/list-vulnerabilities';
 import { listProblems } from './capabilities/list-problems';
 import { getMonitoredEntityDetails } from './capabilities/get-monitored-entity-details';
 import { getOwnershipInformation } from './capabilities/get-ownership-information';
-import { getLogsForEntity } from './capabilities/get-logs-for-entity';
 import { getEventsForCluster } from './capabilities/get-events-for-cluster';
 import { createWorkflowForProblemNotification } from './capabilities/create-workflow-for-problem-notification';
 import { updateWorkflow } from './capabilities/update-workflow';
@@ -394,26 +393,6 @@ const main = async () => {
   );
 
   tool(
-    'get_logs_for_entity',
-    'Get Logs for a monitored entity based on name of the entity on Dynatrace',
-    {
-      entityName: z.string().optional(),
-    },
-    async ({ entityName }) => {
-      const dtClient = await createDtHttpClient(
-        dtEnvironment,
-        scopesBase.concat('storage:logs:read'),
-        oauthClientId,
-        oauthClientSecret,
-        dtPlatformToken,
-      );
-      const logs = await getLogsForEntity(dtClient, entityName);
-
-      return `Logs:\n${JSON.stringify(logs?.map((logLine) => (logLine ? logLine.content : 'Empty log')))}`;
-    },
-  );
-
-  tool(
     'verify_dql',
     'Verify a Dynatrace Query Language (DQL) statement on Dynatrace GRAIL before executing it. This step is recommended for DQL statements that have been dynamically created by non-expert tools. For statements coming from the `generate_dql_from_natural_language` tool as well as from documentation, this step can be omitted.',
     {
@@ -450,11 +429,18 @@ const main = async () => {
 
   tool(
     'execute_dql',
-    'Get Logs, Metrics, Spans or Events from Dynatrace GRAIL by executing a Dynatrace Query Language (DQL) statement. It\'s recommended to use "verify_dql" tool before you execute a DQL statement. A valid statement looks like this: "fetch [logs, spans, events] | filter <some-filter> | summarize count(), by:{some-fields}. Adapt filters for certain attributes: `traceId` could be `trace_id` or `trace.id`.',
+    'Get Logs, Metrics, Spans or Events from Dynatrace GRAIL by executing a Dynatrace Query Language (DQL) statement. ' +
+      'You can also use "generate_dql_from_natural_language" to generate a DQL statement based on your request. ' +
+      'Note: For more information about available fields for filters and aggregation, use the query "fetch dt.semantic_dictionary.models | filter data_object == \"logs\""',
     {
-      dqlStatement: z.string(),
+      dqlStatement: z
+        .string()
+        .describe(
+          'DQL Statement (Ex: "fetch [logs, spans, events] | filter <some-filter> | summarize count(), by:{some-fields}.", "timeseries { avg(<metric-name>), value.A = avg(<metric-name>, scalar: true) }")',
+        ),
     },
     async ({ dqlStatement }) => {
+      // Create a HTTP Client that has all storage:*:read scopes
       const dtClient = await createDtHttpClient(
         dtEnvironment,
         scopesBase.concat(

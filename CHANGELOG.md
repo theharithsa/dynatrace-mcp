@@ -4,6 +4,8 @@
 
 - Added cost considerations disclaimer in README about Dynatrace Grail data access.
 - Added `dtClientContext` to `execute_dql` tool, to allow usage-monitoring for Grail access.
+- Removed `get_logs_for_entity` tool, in favour of `execute_dql`.
+- Added information about Semantic Dictionary for `execute_dql` tool description.
 
 ## 0.5.0 (Release Candidate 4)
 
