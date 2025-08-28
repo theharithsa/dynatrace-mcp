@@ -1,8 +1,10 @@
 # @dynatrace-oss/dynatrace-mcp-server
 
-- Fixed an issue with stateless HTTP server only taking a single connection
-
 ## Unreleased Changes
+
+- Fixed an issue with stateless HTTP server only taking a single connection
+- Added Grail budget tracking with `DT_GRAIL_QUERY_BUDGET_GB` environment variable (default: 1000 GB, setting it to `-1` disables it), as well as warnings and exceeded alerts in `execute_dql` tool responses
+- Enforce Grail budget by throwing an exception when the budget has been exceeded, preventing further DQL query execution
 
 ## 0.6.0 (Release Candidate 1)
 
@@ -10,6 +12,9 @@
 - Added next-steps guidance to `get_entity_details` tool to help users discover related metrics, problems, and logs for entities
 - Added telemetry via Dynatrace OpenKit to improve the product with anonymous usage statistics and error information, enhancing product development while respecting user privacy (can be disabled via `DT_MCP_DISABLE_TELEMETRY` environment variable)
 - Added `server.json` configuration and published the MCP server to the official MCP Registry, making it easier for users to discover and install the server
+- Added metadata output which includes Grail scanned bytes (for cost tracking) to `execute_dql`
+- Added next-steps for `get_entity_details` to find out about metrics, problems and logs
+- Added Telemetry via Dynatrace OpenKit to improve the product with anonymous usage statistics and error information (can be disabled via `DT_MCP_DISABLE_TELEMETRY` environment variable)
 
 ## 0.5.0
 
