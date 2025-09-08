@@ -873,9 +873,8 @@ const main = async () => {
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),
           onsessioninitialized: (sessionId) => {
-            // Store the transport by session ID - using a callback to ensure transport is available
-            const currentTransport = transport;
-            transports[sessionId] = currentTransport;
+            // Store the transport by session ID
+            transports[sessionId] = transport;
             console.error(`New MCP session initialized: ${sessionId}`);
           },
         });
