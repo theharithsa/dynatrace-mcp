@@ -868,20 +868,14 @@ const main = async () => {
       if (sessionId && transports[sessionId]) {
         // Reuse existing transport
         transport = transports[sessionId];
-      } else if (
-        !sessionId &&
-        body &&
-        typeof body === 'object' &&
-        body !== null &&
-        'method' in body &&
-        body.method === 'initialize'
-      ) {
+      } else if (!sessionId && isInitializeRequest(body)) {
         // New initialization request
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),
           onsessioninitialized: (sessionId) => {
-            // Store the transport by session ID
-            transports[sessionId] = transport;
+            // Store the transport by session ID - using a callback to ensure transport is available
+            const currentTransport = transport;
+            transports[sessionId] = currentTransport;
             console.error(`New MCP session initialized: ${sessionId}`);
           },
         });
