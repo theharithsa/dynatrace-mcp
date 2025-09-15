@@ -5,6 +5,7 @@
 - Fixed an issue with stateless HTTP server only taking a single connection
 - Added Grail budget tracking with `DT_GRAIL_QUERY_BUDGET_GB` environment variable (default: 1000 GB, setting it to `-1` disables it), as well as warnings and exceeded alerts in `execute_dql` tool responses
 - Enforce Grail budget by throwing an exception when the budget has been exceeded, preventing further DQL query execution
+- Added tool-annotations `readOnlyHint`, `idempotentHint`, and `openWorldHint`, to improve tool usage
 
 ## 0.6.0 (Release Candidate 1)
 
