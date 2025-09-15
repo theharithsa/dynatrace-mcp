@@ -30,7 +30,8 @@ export function getDynatraceEnv(env: NodeJS.ProcessEnv = process.env): Dynatrace
     );
   }
 
-  if (isNaN(grailBudgetGB) || grailBudgetGB <= 0) {
+  // ToDo: Allow the case of -1 for unlimited Budget
+  if (isNaN(grailBudgetGB) || (grailBudgetGB <= 0 && grailBudgetGB !== -1)) {
     throw new Error('DT_GRAIL_QUERY_BUDGET_GB must be a positive number representing GB budget for Grail queries');
   }
 
