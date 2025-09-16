@@ -89,7 +89,7 @@ export const chatWithDavisCopilot = async (
         metadata: {
           sources: endEvent.data.sources || [],
         },
-      } as ConversationResponse;
+      };
     }
 
     // Fallback: try to construct response from available events
@@ -105,9 +105,9 @@ export const chatWithDavisCopilot = async (
       status: 'SUCCESSFUL',
       state: {},
       metadata: { sources: [] },
-    } as ConversationResponse;
+    };
   }
 
   // Direct ConversationResponse
-  return response as ConversationResponse;
+  return response;
 };
