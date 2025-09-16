@@ -23,6 +23,7 @@ import {
   ConversationResponse,
   ConversationContext,
   State,
+  RecommenderResponse,
 } from '@dynatrace-sdk/client-davis-copilot';
 
 // Re-export types that are used externally
@@ -65,7 +66,7 @@ export const chatWithDavisCopilot = async (
 ): Promise<ConversationResponse> => {
   const client = new PublicClient(dtClient);
 
-  const response = await client.recommenderConversation({
+  const response: RecommenderResponse = await client.recommenderConversation({
     body: {
       text,
       context,
@@ -74,40 +75,13 @@ export const chatWithDavisCopilot = async (
     },
   });
 
-  // Handle both streaming and non-streaming responses
-  // If it's an array (streaming), we need to extract the final response
-  // If it's already a ConversationResponse, return it directly
+  // Type guard: RecommenderResponse is ConversationResponse | EventArray
+  // In practice, the SDK defaults to non-streaming and returns ConversationResponse
   if (Array.isArray(response)) {
-    // For streaming responses, find the end event with the final response
-    const endEvent = response.find((event) => event.event === 'end') as any;
-    if (endEvent?.data) {
-      return {
-        text: endEvent.data.answer || '',
-        messageToken: '', // Will need to get from start event
-        status: 'SUCCESSFUL',
-        state: endEvent.data.state || {},
-        metadata: {
-          sources: endEvent.data.sources || [],
-        },
-      };
-    }
-
-    // Fallback: try to construct response from available events
-    const startEvent = response.find((event) => event.event === 'start') as any;
-    const messageToken = startEvent?.data?.messageToken || '';
-
-    const contentEvents = response.filter((event) => event.event === 'content');
-    const text = contentEvents.map((event: any) => event.data?.text || '').join('');
-
-    return {
-      text,
-      messageToken,
-      status: 'SUCCESSFUL',
-      state: {},
-      metadata: { sources: [] },
-    };
+    throw new Error(
+      'Unexpected streaming response format. Please raise an issue at https://github.com/dynatrace-oss/dynatrace-mcp/issues.',
+    );
   }
 
-  // Direct ConversationResponse
   return response;
 };
